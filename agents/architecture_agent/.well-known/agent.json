@@ -1,0 +1,26 @@
+{
+  "name": "architecture_agent",
+  "description": "An expert cloud architect agent generating scalable, secure system designs and PlantUML C4 architecture diagrams with recommended GCP services.",
+  "version": "1.0.0",
+  "author": "Ngoga Alexis",
+  "capabilities": [
+    "Analyzes system requirements and designs cloud architectures",
+    "Generates PlantUML C4 diagrams with GCP services",
+    "Provides detailed architecture overview and technical specifications",
+    "Suggests cost optimization and implementation roadmap"
+  ],
+  "input_schema": {
+    "prompt": "string (required) — Description of the system or solution to architect."
+  },
+  "output_schema": {
+    "status": "success | error",
+    "response": "Detailed architecture solution including PlantUML diagram and technical recommendations",
+    "error_message": "string (if status is 'error')"
+  },
+  "runtime": {
+    "model": "openai/gpt-4o",
+    "library": "Google Agent Development Kit (ADK)",
+    "entrypoint": "/run"
+  },
+  "license": "MIT"
+}

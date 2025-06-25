@@ -1,0 +1,29 @@
+# Start the orchestrator agent
+uvicorn agents.orchestrator_agent.__main__:app --port 8001 &
+
+# Start the GCP advisor agent
+uvicorn agents.gcp_advisor_agent.__main__:app --port 8002 &
+
+# Start the architecture agent
+uvicorn agents.architecture_agent.__main__:app --port 8003 &
+
+# Start the GCP management agent (Storage + Firestore)
+uvicorn agents.gcp_management_agent.__main__:app --port 8004 &
+
+
+# Start the Chainlit UI
+chainlit run app.py
+
+# Start the Streamlit UI
+streamlit run app.py
+
+
+
+
+#Killing all the task relevant.
+
+taskkill //F //IM uvicorn.exe
+taskkill //F //IM streamlit.exe
+
+taskkill //F //IM uvicorn.exe
+taskkill //F //IM chainlit.exe

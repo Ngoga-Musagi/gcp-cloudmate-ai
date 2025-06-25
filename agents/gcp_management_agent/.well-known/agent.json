@@ -1,0 +1,59 @@
+{
+  "name": "gcp_management",
+  "description": "Manages Google Cloud Storage buckets and Firestore databases. Can create, delete, and list resources with custom configurations.",
+  "version": "1.0.0",
+  "author": "Ngoga Alexis",
+  "capabilities": [
+    "Creates and deletes GCP storage buckets with optional versioning",
+    "Lists all storage buckets in the project",
+    "Initializes and deletes Firestore databases",
+    "Lists Firestore collections and databases",
+    "Supports both default and named Firestore databases"
+  ],
+  "tools": [
+    {
+      "name": "create_storage_bucket",
+      "description": "Creates a storage bucket with specified location, class, and versioning options."
+    },
+    {
+      "name": "delete_storage_bucket",
+      "description": "Deletes a storage bucket, optionally removing all contents first."
+    },
+    {
+      "name": "list_storage_buckets",
+      "description": "Lists all storage buckets in the project."
+    },
+    {
+      "name": "create_firestore_database",
+      "description": "Creates a Firestore database (default or named)."
+    },
+    {
+      "name": "delete_firestore_database",
+      "description": "Deletes a Firestore database or clears data from the default database."
+    },
+    {
+      "name": "list_firestore_databases",
+      "description": "Lists collections and documents in a given Firestore database."
+    },
+    {
+      "name": "list_all_firestore_databases",
+      "description": "Lists all Firestore databases within the project."
+    }
+  ],
+  "input_schema": {
+    "prompt": "string (required) — Natural language instruction for resource operations. Example: 'Create a storage bucket in us-central1 with versioning enabled.'"
+  },
+  "output_schema": {
+    "status": "success | error",
+    "message": "string — Description of the result or any error that occurred.",
+    "resource_type": "string — Type of resource affected, e.g. 'storage_bucket' or 'firestore_database'",
+    "details": "object — Metadata about the resource created, deleted, or listed (optional)",
+    "error_message": "string — Only present if status is 'error'"
+  },
+  "runtime": {
+    "model": "gemini-1.5-flash",
+    "library": "Google Agent Development Kit (ADK)",
+    "entrypoint": "/run"
+  },
+  "license": "MIT"
+}

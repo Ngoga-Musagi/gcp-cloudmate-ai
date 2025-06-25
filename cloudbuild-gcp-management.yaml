@@ -1,0 +1,26 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'Dockerfile.gcp-management',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-management-agent:$BUILD_ID',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-management-agent:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-management-agent:$BUILD_ID']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-management-agent:latest']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'run', 'deploy', 'gcp-management-agent',
+    '--image', 'gcr.io/$PROJECT_ID/gcp-management-agent:latest',
+    '--platform', 'managed',
+    '--region', 'us-central1',
+    '--allow-unauthenticated',
+    '--port', '8004',
+    '--memory', '1Gi',
+    '--cpu', '1',
+    '--max-instances', '10',
+    '--timeout', '3600'
+  ]

@@ -1,0 +1,56 @@
+{
+  "name": "gcp_advisor_agent",
+  "description": "A conversational agent that helps users design, plan, and optimize cloud solutions on Google Cloud Platform (GCP) based on their project goals, budget, scalability needs, and compliance requirements.",
+  "version": "1.0.0",
+  "author": "Ngoga Alexis",
+  "capabilities": [
+    "Understands free-form user prompts about cloud solution needs",
+    "Asks clarifying questions to gather budget, traffic, and technical constraints",
+    "Recommends GCP services aligned with inferred or provided requirements",
+    "Estimates monthly costs and links to pricing calculators",
+    "Advises on scalable, resilient cloud architectures",
+    "Provides industry-specific compliance and security recommendations"
+  ],
+  "tools": [
+    {
+      "name": "search_gcp_services",
+      "description": "Finds suitable GCP services based on the inferred or provided use case, budget, and technical constraints."
+    },
+    {
+      "name": "estimate_costs",
+      "description": "Estimates costs for GCP services and provides cost optimization tips and pricing sources."
+    },
+    {
+      "name": "get_compliance_info",
+      "description": "Fetches compliance and security information relevant to the user's industry (e.g., healthcare, finance, retail)."
+    }
+  ],
+  "input_schema": {
+    "prompt": "string (required) — A natural language description of what the user wants to build on GCP. Example: 'I want to build an e-commerce site that scales to 10,000 users.'"
+  },
+  "output_schema": {
+    "status": "success | error",
+    "clarifying_questions": [
+      "List of follow-up questions to better understand the user's requirements (if needed)"
+    ],
+    "recommendations": {
+      "primary_services": "List of key GCP services with descriptions and links",
+      "alternative_services": "Optional or budget-friendly alternatives",
+      "estimated_costs": "Summary of potential monthly costs or savings",
+      "architecture_tips": "Scalable architecture advice (e.g., serverless, autoscaling, multi-zone)",
+      "best_practices": "DevOps, security, and deployment recommendations"
+    },
+    "compliance_info": {
+      "requirements": "Industry-specific compliance or legal constraints",
+      "certifications": "Relevant GCP certifications (e.g., HIPAA, ISO/IEC 27001)",
+      "best_practices": "Security/governance measures for compliance"
+    },
+    "error_message": "string (if status is 'error')"
+  },
+  "runtime": {
+    "model": "gemini-1.5-flash",
+    "library": "Google Agent Development Kit (ADK)",
+    "entrypoint": "/run"
+  },
+  "license": "MIT"
+}

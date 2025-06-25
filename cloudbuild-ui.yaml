@@ -1,0 +1,26 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'Dockerfile.ui',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-multi-agent-ui:$BUILD_ID',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-multi-agent-ui:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-multi-agent-ui:$BUILD_ID']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-multi-agent-ui:latest']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'run', 'deploy', 'gcp-multi-agent-ui',
+    '--image', 'gcr.io/$PROJECT_ID/gcp-multi-agent-ui:latest',
+    '--platform', 'managed',
+    '--region', 'us-central1',
+    '--allow-unauthenticated',
+    '--port', '8080',
+    '--memory', '1Gi',
+    '--cpu', '1',
+    '--max-instances', '5',
+    '--timeout', '3600'
+  ]

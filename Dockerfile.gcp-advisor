@@ -1,0 +1,12 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
+COPY agents/gcp_advisor_agent/requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+COPY agents/gcp_advisor_agent/ ./agents/gcp_advisor_agent/
+COPY common/ ./common/
+ENV PYTHONPATH=/app
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+EXPOSE 8002
+CMD ["uvicorn", "agents.gcp_advisor_agent.__main__:app", "--host", "0.0.0.0", "--port", "8002"]

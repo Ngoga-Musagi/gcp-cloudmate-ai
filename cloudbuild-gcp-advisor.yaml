@@ -1,0 +1,26 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'Dockerfile.gcp-advisor',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-advisor-agent:$BUILD_ID',
+    '-t', 'gcr.io/$PROJECT_ID/gcp-advisor-agent:latest',
+    '.'
+  ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-advisor-agent:$BUILD_ID']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/gcp-advisor-agent:latest']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: [
+    'run', 'deploy', 'gcp-advisor-agent',
+    '--image', 'gcr.io/$PROJECT_ID/gcp-advisor-agent:latest',
+    '--platform', 'managed',
+    '--region', 'us-central1',
+    '--allow-unauthenticated',
+    '--port', '8002',
+    '--memory', '1Gi',
+    '--cpu', '1',
+    '--max-instances', '10',
+    '--timeout', '3600'
+  ]

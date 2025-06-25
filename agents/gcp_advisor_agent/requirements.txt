@@ -1,0 +1,7 @@
+google-adk
+fastapi==0.115.12
+uvicorn==0.34.3
+httpx==0.28.1
+chainlit==2.5.5
+python-dotenv
+litellm==1.72.6

@@ -18,9 +18,10 @@ steps:
     '--platform', 'managed',
     '--region', 'us-central1',
     '--allow-unauthenticated',
-    '--port', '8080',
+    # REMOVED: '--port', '8080' - Let Cloud Run auto-detect from EXPOSE
     '--memory', '1Gi',
     '--cpu', '1',
     '--max-instances', '5',
-    '--timeout', '3600'
+    '--timeout', '3600',
+    '--set-env-vars', 'ORCHESTRATOR_URL=${_ORCHESTRATOR_URL}'
   ]

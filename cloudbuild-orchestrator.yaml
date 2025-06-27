@@ -18,9 +18,11 @@ steps:
     '--platform', 'managed',
     '--region', 'us-central1',
     '--allow-unauthenticated',
-    '--port', '8001',
+    # REMOVED: '--port', '8001' - Let Cloud Run use container's EXPOSE port (8080)
     '--memory', '2Gi',
     '--cpu', '2',
     '--max-instances', '10',
-    '--timeout', '3600'
+    '--timeout', '3600',
+    '--service-account', 'orchestrator-sa@$PROJECT_ID.iam.gserviceaccount.com',
+    '--set-env-vars', 'GCP_ADVISOR_URL=${_GCP_ADVISOR_URL},ARCHITECTURE_URL=${_ARCHITECTURE_URL},GCP_MANAGEMENT_URL=${_GCP_MANAGEMENT_URL}'
   ]

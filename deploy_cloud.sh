@@ -21,9 +21,45 @@ echo "🔧 Enabling required APIs..."
 gcloud services enable cloudbuild.googleapis.com --project=$PROJECT_ID
 gcloud services enable run.googleapis.com --project=$PROJECT_ID
 gcloud services enable containerregistry.googleapis.com --project=$PROJECT_ID
+gcloud services enable iam.googleapis.com --project=$PROJECT_ID
+
+# Setup IAM permissions for service-to-service communication
+echo "🔐 Setting up IAM permissions..."
+CURRENT_USER=$(gcloud config get-value account)
+echo "Setting up permissions for: $CURRENT_USER"
+
+# Add required IAM roles for orchestrator
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="user:$CURRENT_USER" \
+    --role="roles/iam.serviceAccountAdmin" \
+    --quiet || echo "⚠️ IAM role already exists or permission issue"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="user:$CURRENT_USER" \
+    --role="roles/iam.serviceAccountTokenCreator" \
+    --quiet || echo "⚠️ IAM role already exists or permission issue"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="user:$CURRENT_USER" \
+    --role="roles/run.invoker" \
+    --quiet || echo "⚠️ IAM role already exists or permission issue"
+
+# Create service account for orchestrator if it doesn't exist
+SERVICE_ACCOUNT="orchestrator-sa@$PROJECT_ID.iam.gserviceaccount.com"
+echo "🔑 Creating service account for orchestrator..."
+gcloud iam service-accounts create orchestrator-sa \
+    --display-name="Orchestrator Service Account" \
+    --project=$PROJECT_ID \
+    --quiet || echo "⚠️ Service account already exists"
+
+# Grant Cloud Run invoker role to the service account
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:$SERVICE_ACCOUNT" \
+    --role="roles/run.invoker" \
+    --quiet || echo "⚠️ IAM role already exists"
 
 # Build and deploy agents in correct order (individual agents first, then orchestrator)
-echo "🏗️  Building and deploying individual agents..."
+echo "🏗️ Building and deploying individual agents..."
 
 echo "📦 1/5 Deploying GCP Advisor Agent..."
 if gcloud builds submit --config cloudbuild-gcp-advisor.yaml --project=$PROJECT_ID; then
@@ -78,30 +114,21 @@ echo "   GCP Advisor: $GCP_ADVISOR_URL"
 echo "   Architecture: $ARCHITECTURE_URL"
 echo "   GCP Management: $GCP_MANAGEMENT_URL"
 
-# Deploy orchestrator with agent URLs
+# Deploy orchestrator with agent URLs and service account
 echo "📦 4/5 Deploying Orchestrator Agent..."
-if gcloud builds submit --config cloudbuild-orchestrator.yaml --project=$PROJECT_ID; then
+echo "🔑 Using service account: $SERVICE_ACCOUNT"
+
+if gcloud builds submit --config cloudbuild-orchestrator.yaml --project=$PROJECT_ID \
+  --substitutions=_GCP_ADVISOR_URL=$GCP_ADVISOR_URL,_ARCHITECTURE_URL=$ARCHITECTURE_URL,_GCP_MANAGEMENT_URL=$GCP_MANAGEMENT_URL; then
     echo "✅ Orchestrator Agent deployed successfully"
 else
     echo "❌ Orchestrator Agent deployment failed"
     exit 1
 fi
 
-# Update orchestrator with correct environment variables
-echo "🔧 Updating orchestrator environment variables..."
-if gcloud run services update orchestrator-agent \
-    --region=$REGION \
-    --project=$PROJECT_ID \
-    --set-env-vars="GCP_ADVISOR_URL=$GCP_ADVISOR_URL,ARCHITECTURE_URL=$ARCHITECTURE_URL,GCP_MANAGEMENT_URL=$GCP_MANAGEMENT_URL"; then
-    echo "✅ Orchestrator environment variables updated"
-else
-    echo "❌ Failed to update orchestrator environment variables"
-    exit 1
-fi
-
 # Wait for orchestrator to be ready
 echo "⏳ Waiting for orchestrator to be ready..."
-sleep 15
+sleep 20
 
 # Get orchestrator URL for UI
 ORCHESTRATOR_URL=$(gcloud run services describe orchestrator-agent --region=$REGION --project=$PROJECT_ID --format="value(status.url)" 2>/dev/null)
@@ -114,30 +141,23 @@ fi
 ORCHESTRATOR_URL="${ORCHESTRATOR_URL}/run"
 echo "🔗 Orchestrator URL: $ORCHESTRATOR_URL"
 
+# Wait for orchestrator to be fully ready
+echo "⏳ Waiting for orchestrator to be fully ready..."
+sleep 10
+
 # Deploy UI
 echo "📦 5/5 Deploying Chainlit UI..."
-if gcloud builds submit --config cloudbuild-ui.yaml --project=$PROJECT_ID; then
+if gcloud builds submit --config cloudbuild-ui.yaml --project=$PROJECT_ID \
+  --substitutions=_ORCHESTRATOR_URL=$ORCHESTRATOR_URL; then
     echo "✅ Chainlit UI deployed successfully"
 else
     echo "❌ Chainlit UI deployment failed"
     exit 1
 fi
 
-# Update UI with orchestrator URL
-echo "🔧 Updating UI environment variables..."
-if gcloud run services update gcp-multi-agent-ui \
-    --region=$REGION \
-    --project=$PROJECT_ID \
-    --set-env-vars="ORCHESTRATOR_URL=$ORCHESTRATOR_URL"; then
-    echo "✅ UI environment variables updated"
-else
-    echo "❌ Failed to update UI environment variables"
-    exit 1
-fi
-
 # Test connectivity with better error handling
 echo "🧪 Testing agent connectivity..."
-sleep 10
+sleep 15
 
 test_service() {
     local service=$1
@@ -148,6 +168,7 @@ test_service() {
         return 1
     fi
     
+    # Test /run endpoint
     if curl -s -X POST "$url/run" --connect-timeout 10 --max-time 30 \
         -H "Content-Type: application/json" \
         -d '{"prompt":"health_check"}' > /dev/null 2>&1; then

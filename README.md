@@ -86,7 +86,7 @@ Cloud Functions, AI Platform, and generates visual PlantUML diagram
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/gcp-cloudmate-ai.git
+git clone https://github.com/Ngoga-Musagi/gcp-cloudmate-ai.git
 cd gcp-cloudmate-ai
 ```
 
@@ -283,8 +283,8 @@ gcloud logs read --project=YOUR_PROJECT_ID
 ### Getting Help
 
 - 📖 Check the [Google Cloud Documentation](https://cloud.google.com/docs)
-- 🐛 [Open an Issue](https://github.com/yourusername/gcp-cloudmate-ai/issues)
-- 💬 [Discussions](https://github.com/yourusername/gcp-cloudmate-ai/discussions)
+- 🐛 [Open an Issue](https://github.com/Ngoga-Musagi/gcp-cloudmate-ai/issues)
+- 💬 [Discussions](https://github.com/Ngoga-Musagi/gcp-cloudmate-ai/discussions)
 
 ## 🤝 Contributing
 
@@ -327,15 +327,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Made with ❤️ by [Your Name]**
+**Made with ❤️ by Alexis Ngoga**
 
 *Let your ideas meet the cloud—instantly, intelligently, and effortlessly.*
 
 ## 📊 Stats
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/gcp-cloudmate-ai?style=social)](https://github.com/yourusername/gcp-cloudmate-ai/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/gcp-cloudmate-ai?style=social)](https://github.com/yourusername/gcp-cloudmate-ai/network/members)
-[![GitHub issues](https://img.shields.io/github/issues/yourusername/gcp-cloudmate-ai)](https://github.com/yourusername/gcp-cloudmate-ai/issues)
+[![GitHub stars](https://img.shields.io/github/stars/Ngoga-Musagi/gcp-cloudmate-ai?style=social)](https://github.com/Ngoga-Musagi/gcp-cloudmate-ai/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Ngoga-Musagi/gcp-cloudmate-ai?style=social)](https://github.com/Ngoga-Musagi/gcp-cloudmate-ai/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/Ngoga-Musagi/gcp-cloudmate-ai)](https://github.com/Ngoga-Musagi/gcp-cloudmate-ai/issues)
 
 ---
 
